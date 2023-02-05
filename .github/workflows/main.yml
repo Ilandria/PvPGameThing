@@ -5,19 +5,6 @@ jobs:
   buildAndTestWebGL:
     name: Build for WebGL
     runs-on: ubuntu-latest
-    inputs:
-      name:
-        description: 'Artifact name'
-        required: false
-        default: 'github-pages'
-      path:
-        description: "Path of the directory containing the static assets."
-        required: true
-        default: "build/WebGL/WebGL"
-      retention-days:
-        description: "Duration after which artifact will expire in days."
-        required: false
-        default: "7"
     strategy:
       fail-fast: false
     steps:
@@ -52,10 +39,10 @@ jobs:
             --exclude=.github \
             .
         env:
-          INPUT_PATH: ${{ inputs.path }}
+          INPUT_PATH: build/WebGL/WebGL
       - name: Upload artifact
         uses: actions/upload-artifact@main
         with:
-          name: ${{ inputs.name }}
+          name: github-pages
           path: ${{ runner.temp }}/artifact.tar
-          retention-days: ${{ inputs.retention-days }}
+          retention-days: 7
