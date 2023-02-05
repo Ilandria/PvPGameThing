@@ -1,6 +1,19 @@
 # Using GameCI https://game.ci/docs/github/builder
 name: Build
-on: [push, pull_request]
+on: [push]
+inputs:
+  name:
+    description: 'Artifact name'
+    required: false
+    default: 'github-pages'
+  path:
+    description: "Path of the directory containing the static assets."
+    required: true
+    default: "build/WebGL/WebGL"
+  retention-days:
+    description: "Duration after which artifact will expire in days."
+    required: false
+    default: "7"
 jobs:
   buildAndTestWebGL:
     name: Build for WebGL
@@ -24,7 +37,25 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           targetPlatform: WebGL
-      - uses: actions/upload-artifact@v2
+      - name: Archive artifact
+        shell: sh
+        if: runner.os == 'Linux'
+        run: |
+          chmod -c -R +rX "$INPUT_PATH" | while read line; do
+            echo "::warning title=Invalid file permissions automatically fixed::$line"
+          done
+          tar \
+            --dereference --hard-dereference \
+            --directory "$INPUT_PATH" \
+            -cvf "$RUNNER_TEMP/artifact.tar" \
+            --exclude=.git \
+            --exclude=.github \
+            .
+        env:
+          INPUT_PATH: ${{ inputs.path }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@main
         with:
-          name: Build
-          path: build
+          name: ${{ inputs.name }}
+          path: ${{ runner.temp }}/artifact.tar
+          retention-days: ${{ inputs.retention-days }}
