@@ -1,23 +1,23 @@
 # Using GameCI https://game.ci/docs/github/builder
 name: Build
 on: [push]
-inputs:
-  name:
-    description: 'Artifact name'
-    required: false
-    default: 'github-pages'
-  path:
-    description: "Path of the directory containing the static assets."
-    required: true
-    default: "build/WebGL/WebGL"
-  retention-days:
-    description: "Duration after which artifact will expire in days."
-    required: false
-    default: "7"
 jobs:
   buildAndTestWebGL:
     name: Build for WebGL
     runs-on: ubuntu-latest
+    inputs:
+      name:
+        description: 'Artifact name'
+        required: false
+        default: 'github-pages'
+      path:
+        description: "Path of the directory containing the static assets."
+        required: true
+        default: "build/WebGL/WebGL"
+      retention-days:
+        description: "Duration after which artifact will expire in days."
+        required: false
+        default: "7"
     strategy:
       fail-fast: false
     steps:
